@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Modify File{% endblock %}
+
+{% block content %}
+<div class="container-custom mt-6 bg-github-darker p-6 rounded-md">
+    <form action="/modify_file" method="post" class="mb-6 box-shadow bg-github-darker p-4 rounded-md">
+        <div class="mb-4">
+            <label class="block mb-2 font-semibold">Filename</label>
+            <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="filename" value="{{ filename }}" readonly>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-2 font-semibold">Current Content</label>
+            <textarea class="block w-full bg-gray-200 border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-gray-200 focus:border-gray-500 text-black" readonly>{{ current_content }}</textarea>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-2 font-semibold">New Content</label>
+            <textarea class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" name="new_content" required></textarea>
+        </div>
+        <div class="flex justify-center">
+            <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400">Modify File</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

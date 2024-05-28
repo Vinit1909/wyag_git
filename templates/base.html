@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}WYAG{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .section-spacing {
+      margin-bottom: 20px;
+    }
+    .container-custom {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .bg-github-dark {
+      background-color: #24292d;
+    }
+    .bg-github-darker {
+      background-color: #2b3137;
+    }
+    .text-github-green {
+      color: #2fbb4f;
+    }
+    .text-github-blue {
+      color: #0d74e7;
+    }
+    .border-custom {
+      border: 1px solid #d1d5db;
+    }
+    .button-custom {
+      background-color: #2fbb4f;
+    }
+    .button-custom:hover {
+      background-color: #24963c;
+    }
+    .box-shadow {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .text-white {
+      color: #ffffff;
+    }
+    .text-black {
+      color: #000000;
+    }
+    .max-h-40 {
+      max-height: 10rem;
+    }
+    .overflow-auto {
+      overflow: auto;
+    } 
+  </style>
+  <script>
+    function scrollToElement(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const notifications = document.querySelectorAll('.notification');
+      if (notifications.length > 0) {
+        setTimeout(() => {
+          notifications.forEach(notification => {
+            notification.style.display = 'none';
+          });
+        }, 5000);
+      }
+    });
+  </script>
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+</head>
+<body class="bg-github-dark text-white">
+  <section class="py-6">
+    <div class="container mx-auto">
+      <div class="text-center">
+        <h1 class="text-3xl font-bold">WYAG</h1>
+      </div>
+
+      {% block content %}{% endblock %}
+    </div>
+  </section>
+</body>
+</html>

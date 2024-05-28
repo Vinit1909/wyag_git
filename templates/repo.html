@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}WYAG Web App - Repository{% endblock %}
+
+{% block content %}
+<nav class="bg-black from-gray-700 via-gray-900 to-black py-2 shadow-lg rounded-lg">
+    <div class="container mx-auto flex justify-between items-center px-4">
+        <a class="font-bold text-lg text-white hover:text-blue-600" href="/">WYAG</a>
+        <div class="flex space-x-4">
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#add-file" onclick="scrollToElement('add-file')">Add File</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#commit" onclick="scrollToElement('commit')">Commit</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#status" onclick="scrollToElement('status')">Check Status</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#log" onclick="scrollToElement('log')">Check Log</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#read-file" onclick="scrollToElement('read-file')">Read File</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#delete-file" onclick="scrollToElement('delete-file')">Delete File</a>
+            <a class="hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-600" href="#merge" onclick="scrollToElement('merge')">Merge</a>
+        </div>
+    </div>
+</nav>
+
+<div class="mt-6">
+    <div class="container-custom">
+        <h2 class="text-center text-xl text-github-blue font-semibold mb-4">Current Repository: {{ current_repo if current_repo else 'None' }}</h2>
+
+        <form action="/switch" method="post" class="mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <div class="mb-4">
+                <label class="block mb-2 font-semibold">Switch to Repository</label>
+                <div class="relative">
+                    <select name="repo_name" class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" required>
+                        {% for repo in repos %}
+                        {% if repo != ".DS_Store" %}
+                        <option value="{{ repo }}">{{ repo }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400">Switch Repository</button>
+            </div>
+        </form>
+
+        <div id="file-structure" class="mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <button class="w-full bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="toggleFileStructure()">Files in {{ current_repo if current_repo else 'None' }}</button>
+            <div id="file-structure-content" class="mt-4 bg-white border-custom rounded py-2 px-4 text-black overflow-auto" style="display: none; max-height: 200px;">
+                <pre>
+                    {% for file in user_files %}
+                    {{ file }}
+                    {% endfor %}
+                </pre>
+            </div>
+        </div>
+
+        {% if current_repo %}
+        <div id="add-file" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/add" method="post">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Filename</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="filename" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Content</label>
+                    <textarea class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" name="content" required></textarea>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="scrollToElement('add-file')">Add File</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="commit" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/commit" method="post">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Commit Message</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="message" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="scrollToElement('commit')">Commit</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="status" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/status" method="get">
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="scrollToElement('status')">Check Status</button>
+                </div>
+            </form>
+            {% if status_output %}
+            <div class="mt-4 bg-white border-custom rounded py-2 px-4 text-black">
+                <h2 class="font-semibold">Repository Status:</h2>
+                <pre>{{ status_output }}</pre>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="log" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/log" method="get">
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="scrollToElement('log')">Check Log</button>
+                </div>
+            </form>
+            {% if log_output %}
+            <div class="mt-4 bg-white border-custom rounded py-2 px-4 text-black overflow-auto" style="max-height: 200px;">
+                <h2 class="font-semibold">Commit Logs:</h2>
+                <pre>{{ log_output }}</pre>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="read-file" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/read" method="post">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Filename</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="filename" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400" onclick="scrollToElement('read-file')">Read File</button>
+                </div>
+            </form>
+            {% if file_content %}
+            <div class="mt-4 bg-white border-custom rounded py-2 px-4 text-black overflow-auto" style="max-height: 200px;">
+                <h2 class="font-semibold">File Content:</h2>
+                <pre>{{ file_content }}</pre>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="upload-file" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Upload File</label>
+                    <input type="file" name="file" class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400">Upload File</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="modify-file" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/modify_file" method="get">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Filename</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="filename" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-green-400">Modify File</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="delete-file" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/delete_file" method="post">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Filename</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="filename" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-red-400" onclick="scrollToElement('delete-file')">Delete File</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="merge" class="section-spacing mb-6 box-shadow bg-github-darker p-4 rounded-md">
+            <form action="/merge" method="post">
+                <div class="mb-4">
+                    <label class="block mb-2 font-semibold">Branch to Merge</label>
+                    <input class="block w-full bg-white border-custom rounded py-2 px-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-black" type="text" name="branch" required>
+                </div>
+                <div class="flex justify-center">
+                    <button class="w-1/2 bg-black from-gray-700 via-gray-900 to-black text-white py-2 px-4 rounded hover:bg-gray-800 px-3 py-2 rounded text-white hover:text-blue-400" onclick="scrollToElement('merge')">Merge</button>
+                </div>
+            </form>
+        </div>
+
+        {% else %}
+        <p class="text-center text-red-500">No repository selected. Please initialize or switch to a repository.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    function showDialog(message, category) {
+        const dialog = document.createElement('div');
+        dialog.className = `fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-opacity-50 bg-gray-800 z-50`;
+        dialog.innerHTML = `
+            <div class="bg-${category === 'success' ? 'green-500' : 'red-500'} text-white p-4 rounded shadow-lg max-w-lg mx-auto">
+                <p>${message}</p>
+                <button onclick="closeDialog(this)" class="mt-4 bg-white text-black py-2 px-4 rounded">Close</button>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+    }
+
+    function closeDialog(button) {
+        const dialog = button.closest('div.fixed');
+        dialog.remove();
+    }
+
+    function toggleFileStructure() {
+        const fileStructureContent = document.getElementById('file-structure-content');
+        fileStructureContent.style.display = fileStructureContent.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const messages = JSON.parse('{{ get_flashed_messages(with_categories=true) | tojson | safe }}');
+        if (messages.length > 0) {
+            messages.forEach(([category, message]) => {
+                showDialog(message, category);
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}
